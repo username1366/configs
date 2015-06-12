@@ -1,0 +1,64 @@
+include /etc/openldap/schema/core.schema
+include /etc/openldap/schema/collective.schema
+include /etc/openldap/schema/corba.schema
+include /etc/openldap/schema/cosine.schema
+include /etc/openldap/schema/duaconf.schema
+include /etc/openldap/schema/dyngroup.schema
+include /etc/openldap/schema/inetorgperson.schema
+include /etc/openldap/schema/java.schema
+include /etc/openldap/schema/nis.schema
+include /etc/openldap/schema/openldap.schema
+include /etc/openldap/schema/ppolicy.schema
+include /etc/openldap/schema/samba.schema
+include /etc/openldap/schema/postfix.schema
+
+pidfile         /var/run/openldap/slapd.pid
+argsfile        /var/run/openldap/slapd.args
+
+loglevel 16384 
+#loglevel 0
+
+access to attrs=userPassword
+    by self write
+    by anonymous auth
+    by dn="cn=cyrus,ou=daemon,dc=domain,dc=int" read
+    by dn="cn=service,ou=daemon,dc=domain,dc=int" read
+
+access to attrs=gecos
+    by self read
+    by * read
+
+access to attrs=sambaPwdLastSet,sambaNTPassword,sambaKickoffTime,shadowLastChange,sambaDomainName,sambaPrimaryGroupSID,sambaAcctFlags,sambaSID
+    by self write
+
+access to dn.subtree="sambaDomainName=DOMAIN,dc=domain,dc=int"
+    by * write
+    by * read
+
+access to dn.subtree="ou=addressbook,dc=domain,dc=int"
+    by * write
+    by * read
+
+access to dn.subtree="ou=people,dc=domain,dc=int"
+    by dn="uid=user,ou=people,dc=domain,dc=int" write
+    by * read
+
+access to *
+    by * read
+
+database        bdb
+suffix          "dc=domain,dc=int"
+rootdn          "cn=Manager,dc=domain,dc=int"
+rootpw          {SSHA}OWluDh6znfKJp+ajs1aF3hRVsGrWtIXz 
+directory       /var/lib/ldap 
+
+moduleload syncprov.la
+
+overlay syncprov
+syncprov-checkpoint 100 10
+syncprov-sessionlog 10
+
+index   objectClass     eq
+index   uid,uidNumber,gidNumber     eq
+index   sambaSID,memberUid      eq
+

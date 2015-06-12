@@ -1,0 +1,78 @@
+include /etc/openldap/schema/core.schema
+include /etc/openldap/schema/collective.schema
+include /etc/openldap/schema/corba.schema
+include /etc/openldap/schema/cosine.schema
+include /etc/openldap/schema/duaconf.schema
+include /etc/openldap/schema/dyngroup.schema
+include /etc/openldap/schema/inetorgperson.schema
+include /etc/openldap/schema/java.schema
+include /etc/openldap/schema/nis.schema
+include /etc/openldap/schema/openldap.schema
+include /etc/openldap/schema/ppolicy.schema
+include /etc/openldap/schema/samba.schema
+include /etc/openldap/schema/postfix.schema
+
+pidfile         /var/run/openldap/slapd.pid
+argsfile        /var/run/openldap/slapd.args
+
+loglevel -1
+
+access to attrs=userPassword
+    by self write
+    by anonymous auth
+    by dn="cn=cyrus,ou=daemon,dc=domain,dc=int" read
+    by dn="cn=service,ou=daemon,dc=domain,dc=int" read
+    by dn="cn=postfix,ou=daemon,dc=domain,dc=int" read
+
+access to attrs=sambaPwdLastSet,sambaNTPassword
+    by self write
+
+access to dn.subtree="ou=addressbook,dc=domain,dc=int"
+    by * write
+    by * read
+
+access to dn.subtree="ou=people,dc=domain,dc=int"
+    by * read
+
+access to dn.subtree="ou=group,dc=domain,dc=int"
+    by self write
+    by * read
+
+access to dn.subtree="dc=domain,dc=int"
+    by self write
+    by * read
+
+access to *
+    by * read
+
+#modulepath      /var/lib/ldap
+#moduleload      back_bdb
+
+database        bdb
+suffix          "dc=domain,dc=int"
+rootdn          "cn=Manager,dc=domain,dc=int"
+rootpw          {SSHA}OWluDh6znfKJp+ajs1aF3hRVsGrWtIXz 
+#rootpw          Vfyfuth 
+directory       /var/lib/ldap 
+
+syncrepl        rid=94
+                provider=ldap://192.168.52.69
+                type=refreshOnly
+                interval=00:00:00:30
+                retry="60 +"
+		searchbase="dc=domain,dc=int"
+                filter="(objectClass=*)"
+                attrs="*"
+                scope=sub
+                schemachecking=off
+                bindmethod=simple
+                binddn="cn=Manager,dc=domain,dc=int"
+                credentials=T3xEoVuu
+
+updateref       ldap://192.168.52.69
+
+
+index   objectClass     eq
+index   uid,uidNumber,gidNumber     eq
+index   sambaSID,memberUid      eq
+

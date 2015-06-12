@@ -1,0 +1,36 @@
+[mysqld_safe]
+
+[mysqld]
+port=3306
+socket=/var/lib/mysql/mysql.sock
+pid-file=/var/lib/mysql/mysql.pid
+datadir=/var/lib/mysql
+basedir=/usr
+user=mysql
+log_error=/var/log/mysql/error.log
+log_bin=/var/log/mysql/mysql-bin.log
+expire_logs_days=7
+binlog_format=ROW
+bind-address=192.168.52.89
+max_allowed_packet=20M
+init_connect=‘SET collation_connection = utf8_unicode_ci’
+character-set-server = utf8
+collation-server = utf8_unicode_ci
+wsrep_provider=/usr/lib64/libgalera_smm.so
+wsrep_cluster_name=cluster0
+wsrep_cluster_address=gcomm://192.168.52.88,192.168.52.89,192.168.52.90
+wsrep_node_address=192.168.52.89
+wsrep_sst_method=xtrabackup-v2
+wsrep_sst_auth=backup:password
+wsrep_replicate_myisam="ON"
+innodb_locks_unsafe_for_binlog=1
+innodb_autoinc_lock_mode=2
+innodb_buffer_pool_size=800M
+innodb_log_file_size=256M
+innodb_log_buffer_size=8M
+innodb_flush_log_at_trx_commit=2
+default_storage_engine=InnoDB
+
+[client]
+port=3306
+socket=/var/lib/mysql/mysql.sock
